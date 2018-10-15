@@ -211,7 +211,7 @@ function dynamicQuery (request, response) {
         queryText = queryText.replace('?sudoku=', '');
         sudoku(response, queryText);
     }
-    // the query is invalid
+    // the query is invalid and write a message with it
     else {
         badQuery(response, "bad query");
     }
