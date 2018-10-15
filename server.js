@@ -206,13 +206,14 @@ function dynamicQuery (request, response) {
 
     queryText = request.url.replace("/query","");
     // check if the query is valid
+    console.log(queryText);
     if (queryText.indexOf("?sudoku=") == 0) {
         queryText = queryText.replace('?sudoku=', '');
         sudoku(response, queryText);
     }
     // the query is invalid
     else {
-        badQuery(response);
+        badQuery(response, "bad query");
     }
 }
 
@@ -229,9 +230,9 @@ function handler (request, response) {
         dynamicQuery(request, response);
 	}
 
-    else if (url == ''){
+  else if (url == ''){
         fileServer.serveFile('/index.html',200,{},request,response);
-    }
+  }
 	else {
 		request.addListener('end', function () {
 			fileServer.serve(request, response, function (err, result) {
