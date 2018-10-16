@@ -59,6 +59,9 @@ function badQuery(response, message) {
 
 
 
+//exmaple
+// URL/,,,,,,,,&,,,,,,,,&,,,,,,,,&,,,,,,,,&,,,,,,,,&,,,,,,,,&,,,,,,,,&,,,,,,,,&,,,,,,,,
+
 
 function sudoku (response, line) {
     //final product that we will append to the string
