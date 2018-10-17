@@ -123,7 +123,7 @@ function sudoku (response, line) {
         let sortedArr = row.slice(0).sort();
         for (let j = 1; j < 9; j++) {
             if (sortedArr[j] == sortedArr[j-1] && sortedArr[j] != '_') {
-                badQuery(response, 'fail, duplicate number in a row, row: ' + (i+1));
+                badQuery(response, 'badRow: ' + (i+1));
 
                 return;
             }
@@ -142,7 +142,7 @@ function sudoku (response, line) {
         let sortedArr = column.slice(0).sort();
         for (let j = 1; j < 9; j++) {
             if (sortedArr[j] == sortedArr[j-1] && sortedArr[j] != '_') {
-                badQuery(response, 'fail, duplicate number in a column, column: ' + (i+1));
+                badQuery(response, 'badColumn: ' + (i+1));
 
                 return;
             }
@@ -168,7 +168,7 @@ function sudoku (response, line) {
             let sortedArr = square.slice(0).sort();
             for (let j = 1; j < 9; j++) {
                 if (sortedArr[j] == sortedArr[j-1] && sortedArr[j] != '_') {
-                    badQuery(response, 'fail, duplicate number in a square');
+                    badQuery(response, 'badSquare');
 
                     return;
                 }
@@ -209,7 +209,6 @@ function dynamicQuery (request, response) {
 
     queryText = request.url.replace("/query","");
     // check if the query is valid
-    console.log(queryText);
     if (queryText.indexOf("?sudoku=") == 0) {
         queryText = queryText.replace('?sudoku=', '');
         sudoku(response, queryText);

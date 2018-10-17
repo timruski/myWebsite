@@ -1,7 +1,7 @@
 .sudokuElement
 {
-    width:50px;
-    height: 50px;
+    width:5vw;
+    height: 5vw;
     text-align: center;
     font-weight: bolder;
 }
@@ -9,4 +9,13 @@
 .sudokuElement::placeholder
 {
     font-weight: normal;
+}
+
+.horizontalLine {
+    background-color: black;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    height: 3px;
+    width: 49vw;
 }

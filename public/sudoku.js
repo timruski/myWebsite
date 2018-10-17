@@ -1,7 +1,14 @@
 const reactSudokuBox = document.getElementById('sudokuBox');
-var alteredSudokuGame = [[,,,,,,,,],[,,,,,,,,],[,,,,,,,,],
-                         [,,,,,,,,],[,,,,,,,,],[,,,,,,,,],
-                         [,,,,,,,,],[,,,,,,,,],[,,,,,,,,]];
+var alteredSudokuGame = [[0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0,0]];
+
 var sudokuGame = [[1,2,3,4,5,6,7,8,9],
                   [4,5,6,7,8,9,1,2,3],
                   [7,8,9,1,2,3,4,5,6],
@@ -12,18 +19,80 @@ var sudokuGame = [[1,2,3,4,5,6,7,8,9],
                   [6,4,2,9,7,8,5,3,1],
                   [9,7,8,5,3,1,6,4,2]];
 
+var lastPos = [0,0];
+var lastPosNum = 0;
+
+function strcmp(str1,str2) {
+    return str1 < str2 ? -1 : +(str1 > str2)
+}
+
 function autoListener() {
-  if (this.status == 200) {
-      var obj = this.responseText;
-      obj = JSON.parse(obj).solved;
+    if (this.status == 200) {
+        var obj = this.responseText;
+        obj = JSON.parse(obj).solved;
 
-      sudokuGame = obj;
+        sudokuGame = obj;
 
-      reactApp.setState({sudokuGame:sudokuGame});
-  }
-  else {
-      alert("There are no tags that start with these 2 letters");
-  }
+        reactApp.setState({sudokuGame:sudokuGame});
+    }
+    else if (this.responseText.indexOf('badRow') == 0){
+      console.log("bad row");
+      //get the position of the last element that caused the problem
+      var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
+
+      //save the value of the conflicting number
+      var oldValue = element.value;
+
+      // if it was an actual number
+      if (lastPosNum) {
+          element.value = lastPosNum;
+      }
+      //if it was already a 0 before
+      else {
+          element.value = '';
+      }
+
+      // change the value of the conflicting element
+      alteredSudokuGame[lastPos[0]-1][lastPos[1]-1] = lastPosNum;
+
+      //store the i value
+      var bigI=0;
+      for (let i = 0; i < 9; i++) {
+          //find the other element it conflicts with and make it red
+          if (alteredSudokuGame[lastPos[0]-1][i] == oldValue) {
+              document.getElementById('sud_'+lastPos[0]+(i+1)).style.backgroundColor = "red";
+              bigI = i;
+              break;
+          }
+      }
+      // after 800 ms change the color back to white
+      setTimeout(function(){
+          document.getElementById('sud_'+lastPos[0]+(bigI+1)).style.backgroundColor = "white";
+      }, 500);
+    }
+    else if (this.responseText.indexOf('badColumn') == 0){
+      console.log("bad column");
+      var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
+      if (lastPosNum) {
+          element.value = lastPosNum;
+      }
+      else {
+          element.value = '';
+      }
+    }
+    else if (this.responseText.indexOf('badSquare') == 0){
+      console.log("bad square");
+      var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
+      if (lastPosNum) {
+          element.value = lastPosNum;
+      }
+      else {
+          element.value = '';
+      }
+    }
+    else {
+
+    }
 }
 
 class SudokuElement extends React.Component {
@@ -35,35 +104,81 @@ class SudokuElement extends React.Component {
     change() {
         var row = this.props.rowNum;
         var column = this.props.colNum;
+        var element = document.getElementById('sud_'+row+column);
 
-        var value = document.getElementById('sud_'+row+column).value;
-        alteredSudokuGame[row-1][column-1] = value;
+        var value = element.value;
 
-        //make new sudoku query
-        var string = '';
-        for (let rowNum = 0; rowNum < alteredSudokuGame.length; rowNum++) {
-            if (rowNum) {
-                string += "&";
-            }
-            var row = alteredSudokuGame[rowNum];
-            for (let colNum = 0; colNum < 9; colNum++) {
-                if (colNum) {
-                    string += ",";
-                }
-                if (row[colNum]) {
-                    string += row[colNum];
-                }
-                else {
-                    string += "";
-                }
-            }
+        lastPos = [row,column];
+        lastPosNum = alteredSudokuGame[row-1][column-1];
+
+        if (value <= 0 || value >= 10) {
+            //this only changes inside the input field
+            element.value = "";
         }
+        else {
+            // check for bad ROWS
+            // var selectedRow = alteredSudokuGame[row-1];
+            // // badRow:0 means its good, anything else is bad
+            // var badRow = 0;
+            // for (let i = 0; i < 9; i++) {
+            //     if (i == (column-1)) {
+            //         console.log("continuing");
+            //         continue;
+            //     }
+            //     else if (value & selectedRow[i]){
+            //         badRow++;
+            //     }
+            //     else{}
+            // }
+            //
+            // console.log(badRow);
+            // if (badRow) {
+            //     element.value = "";
+            //     return;
+            // }
 
-        var oReq = new XMLHttpRequest();
-        var url = "query?sudoku="+string;
-        oReq.open("GET",url);
-        oReq.addEventListener("load", autoListener);
-        oReq.send();
+
+            // check for bad columns
+
+
+
+
+            // check for bad squares
+
+
+
+
+
+
+            // if everything is good then do this
+            alteredSudokuGame[row-1][column-1] = value;
+
+            //make new sudoku query
+            var string = '';
+            for (let rowNum = 0; rowNum < alteredSudokuGame.length; rowNum++) {
+                if (rowNum) {
+                    string += "&";
+                }
+                var row = alteredSudokuGame[rowNum];
+                for (let colNum = 0; colNum < 9; colNum++) {
+                    if (colNum) {
+                        string += ",";
+                    }
+                    if (row[colNum]) {
+                        string += row[colNum];
+                    }
+                    else {
+                        string += "";
+                    }
+                }
+            }
+
+            var oReq = new XMLHttpRequest();
+            var url = "query?sudoku="+string;
+            oReq.open("GET",url);
+            oReq.addEventListener("load", autoListener);
+            oReq.send();
+        }
     }
 
     render() {
@@ -86,6 +201,7 @@ class SudokuRow extends React.Component {
     render() {
         // elements is an array
         var row = this.props.row;
+        var num;
 
         var args = [];
         args.push('div');
@@ -93,8 +209,14 @@ class SudokuRow extends React.Component {
 
         for (let i = 0; i < row.length; i++) {
             var j = i+1;
+            if (row[i]==0){
+                num = "";
+            }
+            else {
+                num = row[i];
+            }
             args.push(React.createElement(SudokuElement, {
-                                                          value: row[i],
+                                                          value: num,
                                                           readOnly:'false',
                                                           rowNum:this.props.rowNum,
                                                           colNum:j
