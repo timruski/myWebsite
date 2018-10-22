@@ -55,7 +55,7 @@ function autoListener() {
       // change the value of the conflicting element
       alteredSudokuGame[lastPos[0]-1][lastPos[1]-1] = lastPosNum;
 
-      //store the i value
+      //store the i value from the loop
       var bigI=0;
       for (let i = 0; i < 9; i++) {
           //find the other element it conflicts with and make it red
@@ -71,14 +71,40 @@ function autoListener() {
       }, 500);
     }
     else if (this.responseText.indexOf('badColumn') == 0){
-      console.log("bad column");
-      var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
-      if (lastPosNum) {
-          element.value = lastPosNum;
-      }
-      else {
-          element.value = '';
-      }
+        //get the position of the last element that caused the problem
+        var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
+
+        //save the value of the conflicting number
+        var oldValue = element.value;
+
+        // if it was an actual number
+        if (lastPosNum) {
+            element.value = lastPosNum;
+        }
+        //if it was already a 0 before
+        else {
+            element.value = '';
+        }
+
+        // change the value of the conflicting element
+        alteredSudokuGame[lastPos[0]-1][lastPos[1]-1] = lastPosNum;
+
+        //store the i value from the loop
+        var bigI=0;
+
+        //find the element that conflicts with our input and make it red
+        for (let i = 0; i < 9; i++) {
+            if (alteredSudokuGame[i][lastPos[1]-1] == oldValue) {
+                document.getElementById('sud_'+(i+1)+(lastPos[1])).style.backgroundColor = "red";
+                bigI = i;
+                break;
+            }
+        }
+
+        setTimeout(function(){
+            document.getElementById('sud_'+(bigI+1)+(lastPos[1])).style.backgroundColor = "white";
+        }, 500);
+
     }
     else if (this.responseText.indexOf('badSquare') == 0){
       console.log("bad square");
@@ -116,40 +142,6 @@ class SudokuElement extends React.Component {
             element.value = "";
         }
         else {
-            // check for bad ROWS
-            // var selectedRow = alteredSudokuGame[row-1];
-            // // badRow:0 means its good, anything else is bad
-            // var badRow = 0;
-            // for (let i = 0; i < 9; i++) {
-            //     if (i == (column-1)) {
-            //         console.log("continuing");
-            //         continue;
-            //     }
-            //     else if (value & selectedRow[i]){
-            //         badRow++;
-            //     }
-            //     else{}
-            // }
-            //
-            // console.log(badRow);
-            // if (badRow) {
-            //     element.value = "";
-            //     return;
-            // }
-
-
-            // check for bad columns
-
-
-
-
-            // check for bad squares
-
-
-
-
-
-
             // if everything is good then do this
             alteredSudokuGame[row-1][column-1] = value;
 
