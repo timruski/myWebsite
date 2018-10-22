@@ -22,6 +22,13 @@ var sudokuGame = [[1,2,3,4,5,6,7,8,9],
 var lastPos = [0,0];
 var lastPosNum = 0;
 
+var backspacePressed;
+document.addEventListener('keydown', function(event) {
+    const key = event.key; // const {key} = event; ES6+
+    if (key === "Backspace") {
+        backspacePressed = true;
+}});
+
 function strcmp(str1,str2) {
     return str1 < str2 ? -1 : +(str1 > str2)
 }
@@ -71,6 +78,7 @@ function autoListener() {
       }, 500);
     }
     else if (this.responseText.indexOf('badColumn') == 0){
+        console.log("bad column");
         //get the position of the last element that caused the problem
         var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
 
@@ -107,14 +115,61 @@ function autoListener() {
 
     }
     else if (this.responseText.indexOf('badSquare') == 0){
-      console.log("bad square");
-      var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
-      if (lastPosNum) {
-          element.value = lastPosNum;
-      }
-      else {
-          element.value = '';
-      }
+        console.log("bad sqare");
+        //get the position of the last element that caused the problem
+        var element = document.getElementById('sud_'+lastPos[0]+lastPos[1]);
+
+        //save the value of the conflicting number
+        var oldValue = element.value;
+
+        // if it was an actual number
+        if (lastPosNum) {
+            element.value = lastPosNum;
+        }
+        //if it was already a 0 before
+        else {
+            element.value = '';
+        }
+
+        // change the value of the conflicting element
+        alteredSudokuGame[lastPos[0]-1][lastPos[1]-1] = lastPosNum;
+
+        // figure out which square the element is in.
+        // find the row of the square.
+        var bigRow = Math.ceil(lastPos[0]/3);
+        //find the column of the square.
+        var bigColumn = Math.ceil(lastPos[1]/3);
+
+        // by knowing the bottom right of the square, we can now scan
+        // 2 up and 2 left
+        var rowStart = (bigRow*3) - 2 - 1; // -2 for beggining row of square
+                                           // -1 to adjust from real -> array notation
+
+        var columnStart = (bigColumn*3) - 2 - 1;
+
+        console.log("row start: " + rowStart);
+        console.log("columnStart: " + columnStart);
+
+        //save the row and column of found conflict for later
+        var iRow = 0;
+        var iColumn = 0;
+
+        for (let i = rowStart; i < rowStart+3; i++) {
+            for (let j = columnStart; j < columnStart+3; j++) {
+                if (alteredSudokuGame[i][j] == oldValue) {
+                    document.getElementById('sud_'+(i+1)+(j+1)).style.backgroundColor = "red";
+                    iRow = i;
+                    iColumn = j;
+                    break;
+                }
+            }
+        }
+
+        console.log("row: " + iRow + "  column: " + iColumn + "  with oldValue: " + oldValue);
+
+        setTimeout(function(){
+            document.getElementById('sud_'+(iRow+1)+(iColumn+1)).style.backgroundColor = "white";
+        }, 500);
     }
     else {
 
@@ -128,6 +183,7 @@ class SudokuElement extends React.Component {
     }
 
     change() {
+        console.log("CHANGE!");
         var row = this.props.rowNum;
         var column = this.props.colNum;
         var element = document.getElementById('sud_'+row+column);
@@ -140,8 +196,15 @@ class SudokuElement extends React.Component {
         if (value <= 0 || value >= 10) {
             //this only changes inside the input field
             element.value = "";
+            // if the selected number was deleted, replace it with a 0 and recompute
+            if (backspacePressed) {
+                alteredSudokuGame[row-1][column-1] = 0;
+                backspacePressed = false;
+            }
+
         }
         else {
+            backspacePressed = false;
             // if everything is good then do this
             alteredSudokuGame[row-1][column-1] = value;
 
