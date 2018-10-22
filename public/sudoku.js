@@ -147,8 +147,8 @@ function autoListener() {
 
         var columnStart = (bigColumn*3) - 2 - 1;
 
-        console.log("row start: " + rowStart);
-        console.log("columnStart: " + columnStart);
+        // console.log("row start: " + rowStart);
+        // console.log("columnStart: " + columnStart);
 
         //save the row and column of found conflict for later
         var iRow = 0;
@@ -165,7 +165,7 @@ function autoListener() {
             }
         }
 
-        console.log("row: " + iRow + "  column: " + iColumn + "  with oldValue: " + oldValue);
+        //console.log("row: " + iRow + "  column: " + iColumn + "  with oldValue: " + oldValue);
 
         setTimeout(function(){
             document.getElementById('sud_'+(iRow+1)+(iColumn+1)).style.backgroundColor = "white";
@@ -183,7 +183,7 @@ class SudokuElement extends React.Component {
     }
 
     change() {
-        console.log("CHANGE!");
+        //console.log("CHANGE!");
         var row = this.props.rowNum;
         var column = this.props.colNum;
         var element = document.getElementById('sud_'+row+column);
